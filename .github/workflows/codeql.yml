@@ -1,0 +1,116 @@
+# For most projects, this workflow file will not need changing; you simply need
+# to commit it to your repository.
+#
+# You may wish to alter this file to override the set of languages analyzed,
+# or to provide custom queries or build logic.
+#
+# ******** NOTE ********
+# We have attempted to detect the languages in your repository. Please check
+# the `language` matrix defined below to confirm you have the correct set of
+# supported CodeQL languages.
+#
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
+  schedule:
+    - cron: '18 9 * * 4'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp', 'python', 'swift' ]
+        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby', 'swift' ]
+        # Use only 'java' to analyze code written in Java, Kotlin or both
+        # Use only 'javascript' to analyze code written in JavaScript, TypeScript or both
+        # Learn more about CodeQL language support at https://aka.ms/codeql-docs/language-support
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        # If you wish to specify custom queries, you can do so here or in a config file.
+        # By default, queries listed here will override any specified in a config file.
+        # Prefix the list here with "+" to use these queries and those in the config file.
+
+        # For more details on CodeQL's query packs, refer to: https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
+        # queries: security-extended,security-and-quality
+
+
+    # Autobuild attempts to build any compiled languages  (C/C++, C#, Go, or Java).
+    # If this step fails, then you should remove it and run the build manually (see below)
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    # ℹ️ Command-line programs to run using the OS shell.
+    # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
+
+    #   If the Autobuild fails above, remove it and uncomment the following three lines.
+    #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
+
+    # - run: |
+    #     echo "Run, Build Application using script"
+    #     ./location_of_script_within_repo/buildscript.sh
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+       category: "/language:${{matrix.language}}"
+- name: OpenShift Self Hosted Runner Installer
+  # You may pin to the exact commit or the version.
+  # uses: redhat-actions/openshift-actions-runner-installer@8b4d88c1808ced3a39fd0e43f9ce038163fad8a8
+  uses: redhat-actions/openshift-actions-runner-installer@v1
+  with:
+    # GitHub Personal access token. The token must have the "repo" permission scope.
+For organization runners, the token must also have the "admin:org" scope.
+
+    github_pat: 
+    # Repository or organization for the self-hosted runner.
+For example, "redhat-actions/check-self-hosted-runner" for a repository, or "redhat-actions" for an organization.
+Defaults to the current repository.
+
+    runner_location: # optional
+    # Container image to use for the runner.
+    runner_image: # optional
+    # Tag to use for the runner container image.
+    runner_tag: # optional
+    # Labels in the runners to check for.
+For multiple labels, separate by comma and an optional space. For example, "label1, label2".
+
+    runner_labels: # optional
+    # Number of runner replicas to create.
+    runner_replicas: # optional, default is 1
+    # Optional namespace (aka project) to pass to all Helm or Kubernetes commands.
+
+    namespace: # optional
+    # Uninstall any release that matches the `helm_release_name` and `namespace` before running `helm install`.
+If this is false, and the release exists, the action will fail when the `helm install` fails.
+
+    helm_uninstall_existing: # optional, default is true
+    # The Helm Release name to give the new runner release. Defaults to the repository or org name plus "-runners".
+    helm_release_name: # optional
+    # Any other arguments to pass to the 'helm install' command.
+Separate arguments by newline. Do not use quotes - @actions/exec will do the quoting for you.
+
+    helm_extra_args: # optional
+    # Version of our Helm Chart to install. Defaults to the latest.
+    helm_chart_version: # optional
